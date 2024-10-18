@@ -23,6 +23,7 @@ export const characterOptions = [
 export const characterOptions = [
   'Audit Specialist',
   'Default AI',
+  'GPT-4o'
 ];
 
 export const characterOptionsWithEmojis = {

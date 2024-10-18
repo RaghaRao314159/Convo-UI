@@ -133,7 +133,7 @@ export function Textbox() {
     <Wrapper isMobile={isTabletOrMobile}>
       {characterSelected !== characterOptions[0] && !isTabletOrMobile && (
         <Character>
-          You are now speaking to a virtual {characterSelected}. Cool eh?
+          You are now speaking to {characterSelected}.
         </Character>
       )}
       <ChatBubbles isTyping={initialLoading} messages={messages} />
