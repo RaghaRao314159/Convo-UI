@@ -20,7 +20,7 @@ export function ChatPage() {
       <Body>
         {!isTabletOrMobile && <LeftSidebar />}
         <Wrapper isMobile={isTabletOrMobile}>
-          <Title>📣 AuditBot</Title>
+          <Title></Title>
           <Textbox />
         </Wrapper>
       </Body>
