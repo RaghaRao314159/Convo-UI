@@ -66,20 +66,6 @@ export const sendMessage = async function* (
 ) {
   let copy = [...messages];
 
-  /*
-  if (model === 'gpt-4') {
-    if (copy.length > 12) {
-      copy = copy.slice(copy.length - 12, copy.length);
-    }
-  }
-
-  if (model === 'gpt-4-1106-preview') {
-    if (copy.length > 16) {
-      copy = copy.slice(copy.length - 16, copy.length);
-    }
-  }
-  */
-
   // Add assistant support
   copy = [
     {
@@ -88,16 +74,6 @@ export const sendMessage = async function* (
     },
     ...copy,
   ];
-
-  /*
-  copy = [
-    {
-      role: 'system',
-      content: "Return everything in markdown code.",
-    },
-    ...copy,
-  ];
-  */
 
   //Langserve
   // guardrails
