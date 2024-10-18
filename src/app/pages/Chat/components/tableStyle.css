@@ -1,0 +1,16 @@
+.table-container table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table-container th,
+.table-container td {
+    border: 1px solid #555;
+    /* Subtle border that works in both modes */
+    padding: 10px;
+    text-align: left;
+}
+
+.table-container th {
+    font-weight: bold;
+}
