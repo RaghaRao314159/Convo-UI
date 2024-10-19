@@ -8,6 +8,12 @@
 
 This is a custom Chatbot UI that has been modified from [TurboGPT](https://github.com/mikebpech/turbogpt.ai) in order to accomodate RAG applications. 
 
+<div align="center">
+  <a href="https://convo-ui.vercel.app/">
+    <img src="public/screenshot_dark.png" alt="Logo" width="200" height="120">
+  </a>
+<div>
+
 ## Table of Contents
 
 1. [Purpose](#purpose)
