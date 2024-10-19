@@ -135,11 +135,11 @@ export function Overlay({ isOpened = false }: { isOpened: boolean }) {
         <Footer>
           <div className="items">
             <Item
-              href="https://www.ago.gov.sg/publications/annual-reports/"
+              href="https://github.com/RaghaRao314159/Convo-UI"
               target="_blank"
-              title="Annual Audit Reports"
+              title="Source Code"
             >
-              Annual Audit Reports
+              Source Code
             </Item>
           </div>
         </Footer>
