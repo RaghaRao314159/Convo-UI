@@ -8,11 +8,7 @@
 
 This is a custom Chatbot UI that has been modified from [TurboGPT](https://github.com/mikebpech/turbogpt.ai) in order to accomodate RAG applications. 
 
-<div align="center">
-  <a href="https://convo-ui.vercel.app/">
-    <img src="public/screenshot_dark.png" alt="Logo" width="200" height="120">
-  </a>
-<div>
+[![Product Name Screen Shot][product-screenshot]](https://convo-ui.vercel.app)
 
 ## Table of Contents
 
@@ -132,3 +128,5 @@ Text boxes are created and updated in ["src/app/pages/Chat/Textbox.tsx"](src/app
 [OpenAi-url]: https://openai.com
 [React]: https://img.shields.io/badge/react_native-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB
 [React-url]: https://react.dev
+
+[product-screenshot]: public/screenshot_dark.png
