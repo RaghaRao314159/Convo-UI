@@ -21,7 +21,7 @@ export const characterOptions = [
 */
 
 export const characterOptions = [
-  'Audit Specialist',
+  'Backend Model',
   'Default AI',
   'GPT-4o'
 ];

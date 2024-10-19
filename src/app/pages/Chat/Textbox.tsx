@@ -41,41 +41,72 @@ export function Textbox() {
   const { isLoading, isRefetching, refetch } = useQuery(
     'chat',
     async () => {
-      setInitialLoading(true);
-      const results = sendMessage(
-        apiKey,
-        messages,
-        moodSelected,
-        characterSelected,
-        modelSelected,
-        customPrompt,
-      );
-
-
-      setInitialLoading(false);
-
-      dispatch(
-        actions.setMessages([...messages, { role: 'assistant', content: ''}])
-      );
-
-      for await (const result of results) {
-        if (result.answer === 'DONE') {
+      console.log(characterSelected);
+      if (characterSelected === 'GPT-4o') {
+        console.log("entered GPT-4o");
+        setInitialLoading(true);
+        const dataLines = sendMessage(
+            apiKey,
+            messages,
+            moodSelected,
+            characterSelected,
+            modelSelected,
+            customPrompt,
+        );
+        const next = await dataLines.next();
+        setInitialLoading(false);
+        updateLastMessage2(next.value);
+        dispatch(
+            actions.setMessages([...messages, { role: 'assistant', content: '' }]),
+        );
+        for await (const data of dataLines) {
+            if (data === 'DONE') {
             dispatch(actions.finalizeLastMessage());
             break;
-          }
+            }
 
-        if (stopRequest) {
-            // @ts-ignore
-            results.return();
+            if (stopRequest) {
+            dataLines.return();
             stopRequest = false;
-          }
+            }
+            updateLastMessage2(data);
+        }
+      }
 
-        updateLastMessage(result);
-        /*
-        dispatch(
-            actions.setMessages([...messages, { role: 'assistant', content: result.answer }]),
+      else {
+        console.log("entered alt ai");
+        setInitialLoading(true);
+        const results = sendMessage(
+            apiKey,
+            messages,
+            moodSelected,
+            characterSelected,
+            modelSelected,
+            customPrompt,
         );
-        */
+
+
+        setInitialLoading(false);
+        
+        dispatch(
+            actions.setMessages([...messages, { role: 'assistant', content: ''}])
+        );
+        
+
+        for await (const result of results) {
+            if (result.answer === 'DONE') {
+                dispatch(actions.finalizeLastMessage());
+                break;
+            }
+
+            if (stopRequest) {
+                // @ts-ignore
+                results.return();
+                stopRequest = false;
+            }
+
+            updateLastMessage(result);
+        }
       }
     },
     {
@@ -84,23 +115,16 @@ export function Textbox() {
   );
 
   const updateLastMessage = (data: any) => {
-    /*
+    if (data.answer) {
+        dispatch(actions.updateLastMesssage(data.answer));
+    }
+
+  };
+
+  const updateLastMessage2 = (data: any) => {
     if (data.choices?.length > 0 && data.choices[0].delta.content) {
       dispatch(actions.updateLastMesssage(data.choices[0].delta.content));
     }
-    */
-   /*
-    try {
-        const answer_str = data.answer;
-        const answer_obj = json.parse()
-        dispatch(actions.updateLastMesssage(data.answer));
-    }
-    catch (err) {
-        dispatch(actions.updateLastMesssage(data.answer));
-    }
-    */
-    dispatch(actions.updateLastMesssage(data.answer));
-
   };
 
   const handleRegenLastMessage = () => {

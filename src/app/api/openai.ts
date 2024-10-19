@@ -3,7 +3,8 @@ import { Message } from 'utils/types/injector-typings';
 import { characterPrompts } from './characters';
 import { RemoteRunnable } from "@langchain/core/runnables/remote";
 
-
+// Template for For langserve
+/* 
 const chat_chain = new RemoteRunnable({
   url: `http://localhost:8000/chat`,
 });
@@ -23,7 +24,7 @@ const guardrail_inappropriate_chain = new RemoteRunnable({
 const guardrail_irrelevant_chain = new RemoteRunnable({
   url: `http://localhost:8000/irrelevant`,
 });
-
+*/
 
 // Make an API Call to check if the key is valid on OpenAI
 export const checkOpenAiKeyValid = (key: string, model: string) =>
@@ -40,22 +41,24 @@ export const checkOpenAiKeyValid = (key: string, model: string) =>
     }),
   });
 
+// Fetch message from general api-end point 
 const fetchMessage = (key: string, messages: Message[], model: ApiModel, api_endpoint: string) => {
   return fetch(api_endpoint, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${key}`,
+      Authorization: `${key}`,
       'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       stream: true,
       model: model || 'gpt-3.5-turbo',
-      messages: messages,
+      messages: messages
     }),
   });
 };
 
+// send message to user
 export const sendMessage = async function* (
   key: string,
   messages: Message[],
@@ -75,161 +78,123 @@ export const sendMessage = async function* (
     ...copy,
   ];
 
-  //Langserve
-  // guardrails
-  /*
-  let response;
-  if (characterSelected === "Default AI") {
-    response = await chat_chain.stream(copy);
-  }
-  else {
-    const inappropriate = await guardrail_inappropriate_chain.invoke(copy);
-
-    if (inappropriate) {
-      console.log("I'm sorry, I can't respond to that.");
-      yield {"answer": "I'm sorry, I can't respond to that."};
-      yield {"answer": "DONE"};
-      return;
-    }
-
-    const irrelevant = await guardrail_irrelevant_chain.invoke(copy);
-    if (irrelevant) {
-      console.log("This question is irrelevant. Please ask something related to the audit reports.");
-      yield {"answer": "This question is irrelevant. Please ask something related to the audit reports."};
-      yield {"answer": "DONE"};
-      return;
-    }
-    // agency
-    const decisions = await all_agent_chain.invoke(copy);
-    console.log("all_agent:", decisions );
-
-    // use agent to check if RAG is needed
-    // const check = await agent_chain.invoke(copy);
-    // @ts-ignore
-    const check = (decisions["Is information retrieval from corpus needed?"] === "YES");
-    console.log("need rag:", check);
-
-    // Call different langchains for nirmal convos or RAGs
-    if (!check) {
-      response = await chat_chain.stream(copy);
-    } 
-    else {
-      // @ts-ignore
-      // let question = copy.at(-1)["content"];
-      const question = decisions["question"];
-      // response = await rag_chain.stream(copy);
-      console.log(question);
-      response = await rag_chain.stream(question);
-    }
-  }
-  // loop until the streaming stops
-  while (true) {
-
-    // return a JSON object to frontend  
-    let parsedData = {"answer": ""};
-
-    // idx keeps track of streaming index. 
-    let idx = 0;
-
-    // async for loop as response is a generator
-    for await (const line of response) {
-      // try get a streamed response or throw error
-      try {
-        // This is to prevent the streaming from stopping when the first message 
-        // is empty.
-        // @ts-ignore
-        if (line.length === 0 && idx > 0) {
-
-          // stream has ended
-          parsedData.answer = "DONE";
-          yield parsedData;
+  // directly calling to GPT-4o
+  if (characterSelected === "GPT-4o") {
+    const openai_endpoint = 'https://api.openai.com/v1/chat/completions';
+    const response = await fetchMessage(key, copy, model, openai_endpoint);
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
           break;
         }
-        else {
+        const dataLines = decoder
+          .decode(value, { stream: true })
+          .split('\n')
+          .filter(line => line.length > 0)
+          .map(line => line.slice(6));
 
-          // capture the stream text and send it over to textbox for UI display
-          parsedData.answer = String(line);
-          yield parsedData;
+        for (const dataLine of dataLines) {
+          if (dataLine === '[DONE]') {
+            yield 'DONE';
+            break;
+          }
+          yield JSON.parse(dataLine);
         }
-        idx += 1;
-      } 
-      catch (e) {
-        console.error("Failed to obtain stream:", e);
       }
+    } finally {
+      await reader.cancel();
     }
   }
-  */
-  
+  else if (characterSelected === "Backend Model") {
+    // Using Flask Server
+    // takes api key from user
+    const flask_endpoint = 'http://127.0.0.1:5000';
+    const response = await fetchMessage(key, copy, model, flask_endpoint);
 
-  // Using Flask Server
-  /*
-  const flask_endpoint = 'http://127.0.0.1:5000';
-  const response = await fetchMessage(key, copy, model, flask_endpoint);
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
 
-  const reader = response.body!.getReader();
-  const decoder = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
+      // Decode the chunk of data received
+      const chunk = decoder.decode(value, { stream: true });
+    
+      // Parse the SSE format data
 
-    // Decode the chunk of data received
-    const chunk = decoder.decode(value, { stream: true });
-  
-    // Parse the SSE format data
+      let parsedData = {"answer": ""};
 
-    let parsedData = {"answer": ""};
-    const lines = chunk.split('\n');
-    for (const line of lines) {
-        if (line.startsWith('data: ')) {
-            const jsonString = line.substring(6);
-            try {
+      const lines = chunk.split('\n');
 
-                parsedData = JSON.parse(jsonString);
-                if (parsedData.answer === 'DONE') {
+      for (const line of lines) {
+
+          if (line.startsWith('data: ')) {
+              const jsonString = line.substring(6);
+              try {
+
+                  parsedData = JSON.parse(jsonString);
+                  if (parsedData.answer === 'DONE') {
+                    yield parsedData;
+                    break;
+                  }
+
                   yield parsedData;
-                  break;
-                }
-                yield parsedData;
-            } catch (e) {
-                console.error("Failed to parse JSON:", e);
-            }
+              } catch (e) {
+                  console.error("Failed to parse JSON:", e);
+              }
+          }
+      }
+    }
+  }
+  /*
+  //Langserve
+  // requires setting api key in backend
+  if (characterSelected === "Backend Model - Langserve") {
+    let response;
+    response = await chat_chain.stream(copy);
+    // response = await chat_chain.stream(copy);
+    // loop until the streaming stops
+    while (true) {
+      // return a JSON object to frontend  
+      let parsedData = {"answer": ""};
+
+      // idx keeps track of streaming index. 
+      let idx = 0;
+
+      // async for loop as response is a generator
+      for await (const line of response) {
+        // try get a streamed response or throw error
+        try {
+          // This is to prevent the streaming from stopping when the first message 
+          // is empty.
+          // @ts-ignore
+          if (line.length === 0 && idx > 0) {
+
+            // stream has ended
+            parsedData.answer = "DONE";
+            yield parsedData;
+            break;
+          }
+          else {
+
+            // capture the stream text and send it over to textbox for UI display
+            parsedData.answer = String(line);
+            yield parsedData;
+          }
+          idx += 1;
+        } 
+        catch (e) {
+          console.error("Failed to obtain stream:", e);
         }
+      }
     }
   }
   */
 
-  // direct API Call
-  const openai_endpoint = 'https://api.openai.com/v1/chat/completions';
-  const response = await fetchMessage(key, copy, model, openai_endpoint);
-
-  const reader = response.body!.getReader();
-  const decoder = new TextDecoder();
-
-  let parsedData = {"answer": ""};
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) {
-      break;
-    }
-    const dataLines = decoder
-      .decode(value, { stream: true })
-      .split('\n')
-      .filter(line => line.length > 0)
-      .map(line => line.slice(6));
-
-    for (const dataLine of dataLines) {
-      if (dataLine === '[DONE]') {
-        parsedData.answer = 'DONE';
-        yield parsedData;
-        break;
-      }
-      
-      parsedData.answer = JSON.parse(dataLine).choices[0].delta.content ?? '';
-      yield parsedData;
-    }
-  }
 };
 
 

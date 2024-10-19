@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components/macro';
 import ConfettiExplosion from 'react-confetti-explosion';
 import { useMediaQuery } from 'react-responsive';
-import { ReactComponent as LogoIcon } from './assets/bot.svg';
+import { ReactComponent as LogoIcon } from './assets/logo.svg';
 import { useSelector } from 'react-redux';
 import { getModel } from 'app/pages/Chat/slice/selectors';
 
