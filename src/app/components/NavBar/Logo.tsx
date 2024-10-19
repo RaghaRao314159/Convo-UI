@@ -29,17 +29,6 @@ export function Logo() {
       )}
     </Wrapper>
   );
-  
-  
-  /*
-  return (
-    <Wrapper>
-      <Title>
-        AuditBot
-      </Title>
-    </Wrapper>
-  );
-  */
 }
 
 const Wrapper = styled.div`
