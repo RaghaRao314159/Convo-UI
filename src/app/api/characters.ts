@@ -22,7 +22,6 @@ export const characterOptions = [
 
 export const characterOptions = [
   'Backend Model',
-  'Default AI',
   'GPT-4o'
 ];
 
