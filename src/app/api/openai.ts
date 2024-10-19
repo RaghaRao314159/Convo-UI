@@ -58,6 +58,24 @@ const fetchMessage = (key: string, messages: Message[], model: ApiModel, api_end
   });
 };
 
+// Fetch message from OpenAI api-end point 
+const fetchMessageOpenAI = (key: string, messages: Message[], model: ApiModel) => {
+  return fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${key}`,
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json',
+      referrer: 'https://turbogpt.ai/',
+    },
+    body: JSON.stringify({
+      stream: true,
+      model: model || 'gpt-3.5-turbo',
+      messages: messages,
+    }),
+  });
+};
+
 // send message to user
 export const sendMessage = async function* (
   key: string,
@@ -80,8 +98,7 @@ export const sendMessage = async function* (
 
   // directly calling to GPT-4o
   if (characterSelected === "GPT-4o") {
-    const openai_endpoint = 'https://api.openai.com/v1/chat/completions';
-    const response = await fetchMessage(key, copy, model, openai_endpoint);
+    const response = await fetchMessageOpenAI(key, copy, model);
     const reader = response.body!.getReader();
     const decoder = new TextDecoder();
     try {
@@ -97,6 +114,7 @@ export const sendMessage = async function* (
           .map(line => line.slice(6));
 
         for (const dataLine of dataLines) {
+          console.log(dataLine);
           if (dataLine === '[DONE]') {
             yield 'DONE';
             break;
@@ -111,7 +129,9 @@ export const sendMessage = async function* (
   else if (characterSelected === "Backend Model") {
     // Using Flask Server
     // takes api key from user
-    const flask_endpoint = 'http://127.0.0.1:5000';
+    // const flask_endpoint = 'http://127.0.0.1:5000';
+    // const flask_endpoint = 'convo-ui-backend.vercel.app';
+    const flask_endpoint = 'https://convoui.pythonanywhere.com/';
     const response = await fetchMessage(key, copy, model, flask_endpoint);
 
     const reader = response.body!.getReader();
