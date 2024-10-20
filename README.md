@@ -6,7 +6,7 @@
 
 ## Introduction
 
-This is a custom Chatbot UI that has been modified from [TurboGPT](https://github.com/mikebpech/turbogpt.ai) in order to accomodate RAG applications. 
+This is a custom Chatbot UI that has been modified from [TurboGPT](https://github.com/mikebpech/turbogpt.ai) in order to accomodate RAG applications. [Try Convo UI](https://convo-ui.vercel.app)
 
 [![Product Name Screen Shot][product-screenshot]](https://convo-ui.vercel.app)
 
