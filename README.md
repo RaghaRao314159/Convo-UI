@@ -7,7 +7,6 @@
 ## Introduction
 
 This is a custom Chatbot UI that has been modified from TurboGPT in order to accomodate RAG applications. [Try Convo UI](https://convo-ui.vercel.app)
-<script defer data-url="https://devhunt.org/tool/convo-ui" src="https://cdn.jsdelivr.net/gh/sidiDev/devhunt-banner/indexV0.js" />
    
 [![Product Name Screen Shot][product-screenshot]](https://convo-ui.vercel.app)
 
